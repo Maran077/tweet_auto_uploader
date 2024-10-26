@@ -156,7 +156,7 @@ const uploadMeme = async () => {
     const browser = await puppeteer.launch({
       executablePath,
       args: chromium.args,
-      headless: false,
+      headless: chromium.headless,
       defaultViewport: chromium.defaultViewport,
     });
     const page = await browser.newPage();
