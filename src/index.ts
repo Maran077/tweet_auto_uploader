@@ -136,10 +136,11 @@ async function waitForEnabledButton(page: Page, selector: string) {
 }
 
 function waitForSeconds() {
+  const seconds = 20;
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve("5 seconds have passed");
-    }, 10000);
+      resolve("20 seconds have passed");
+    }, seconds * 1000);
   });
 }
 
