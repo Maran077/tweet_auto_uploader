@@ -148,7 +148,7 @@ function waitForSeconds() {
   });
 }
 
-async function uploadMeme() {
+const uploadMeme = async () => {
   try {
     const { fileName, success } = await getPicture(); // Download image
     if (!success) return; // Exit if download fails
@@ -156,7 +156,7 @@ async function uploadMeme() {
     const browser = await puppeteer.launch({
       executablePath,
       args: chromium.args,
-      headless: chromium.headless,
+      headless: false,
       defaultViewport: chromium.defaultViewport,
     });
     const page = await browser.newPage();
@@ -193,7 +193,7 @@ async function uploadMeme() {
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 // function main() {
 //   const hrs = 3.2;
@@ -205,8 +205,8 @@ async function uploadMeme() {
 
 // main();
 
-app.get("/", (req, res) => {
-  uploadMeme();
+app.get("/", async (req, res) => {
+  await uploadMeme();
   res.send("Hello World!");
 });
 
