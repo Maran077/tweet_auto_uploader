@@ -1,0 +1,95 @@
+# Twitter Meme Auto Uploader
+
+This project is a bot that automatically uploads memes from the r/memes subreddit to your Twitter account. Using Puppeteer for browser automation and Snoowrap for interacting with the Reddit API, it downloads the latest meme post image and uploads it to Twitter at a regular interval. The project is written in TypeScript for better type safety and maintainability.
+
+## Features
+
+    - Automated Meme Fetching: Fetches the latest post image from r/memes on Reddit.
+    - Automated Twitter Upload: Logs into Twitter and uploads the meme.
+    - Scheduled Uploads: Runs at a specified interval (default is every 3.2 hours).
+    - Temporary File Management: Automatically deletes downloaded files after upload.
+
+## Requirements
+
+    - TypeScript
+    - Node.js (version 14+ recommended)
+    - Twitter account
+    - Reddit API credentials
+    - Puppeteer
+    - Snoowrap
+
+## Installation
+
+    Clone this repository:
+
+```bash
+
+git clone https://github.com/Maran077/tweet_auto_uploader.git
+cd twitter-meme-uploader
+```
+
+### Install the required packages:
+
+```bash
+npm install puppeteer snoowrap dotenv
+```
+
+### Set up your environment variables.
+
+Create a .env file in the root of your project and add your Reddit and Twitter API credentials:
+
+```text
+USER_AGENT=your_reddit_user_agent
+CLIENT_ID=your_reddit_client_id
+CLIENT_SECRET=your_reddit_client_secret
+USERNAME=your_reddit_username
+PASSWORD=your_reddit_password
+TWITTER_BEARER_TOKEN=your_twitter_bearer_token
+TWITTER_USER_ID=your_twitter_user_id
+```
+
+### Compile TypeScript:
+
+```bash
+
+npx tsc
+```
+
+### Run the compiled JavaScript file:
+
+```bash
+    node dist/app.js
+```
+
+### Configuration
+
+    Reddit Credentials: Reddit credentials are set in the .env file. These are used for fetching memes.
+    Twitter Cookies: Your Twitter auth cookies (such as auth_token and twid) are stored in the cookies array in the code.
+    Interval Configuration: The bot's interval can be adjusted in the main() function. The default interval is set to 3.2 hours, but you can change this by modifying the hrs variable.
+
+### Usage
+
+To start uploading memes at regular intervals, simply run:
+
+```bash
+
+node dist/app.js
+```
+
+### The bot will:
+
+    Fetch the latest post from the r/memes subreddit.
+    Download the image.
+    Upload it to Twitter and delete the image file.
+    Repeat this process at the set interval.
+
+### TypeScript-Specific Notes
+
+    Type Declarations: TypeScript is used for type safety, and the project includes type declarations, such as Page, ElementHandle, and CookieParam.
+    Interface for Download Result: The DownloadResult interface is used to define the structure for the image download response.
+    Compilation: Use npx tsc to compile TypeScript to JavaScript before running the bot.
+
+### Troubleshooting
+
+    Image Not Found: Ensure that posts contain an image with .jpg, .jpeg, or .png extensions.
+    Twitter Upload Issues: If the bot fails to log in to Twitter, verify that your auth_token and twid are valid in the .env file.
