@@ -4,7 +4,11 @@ import chromium from "@sparticuz/chromium";
 import snoowrap from "snoowrap";
 import https from "https";
 import fs from "fs";
+import express from "express";
+const app = express();
+const PORT = 3000;
 import { config } from "dotenv";
+
 config();
 // console.log("USER_AGENT:", process.env.USER_AGENT);
 // console.log("CLIENT_ID:", process.env.CLIENT_ID);
@@ -191,12 +195,21 @@ async function uploadMeme() {
   }
 }
 
-function main() {
-  const hrs = 3.2;
-  uploadMeme();
-  setInterval(() => {
-    uploadMeme();
-  }, hrs * 60 * 60 * 1000);
-}
+// function main() {
+//   const hrs = 3.2;
+//   uploadMeme();
+//   setInterval(() => {
+//     uploadMeme();
+//   }, hrs * 60 * 60 * 1000);
+// }
 
-main();
+// main();
+
+app.get("/", (req, res) => {
+  uploadMeme();
+  res.send("Hello World!");
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
