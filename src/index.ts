@@ -204,7 +204,7 @@ const uploadMeme = async () => {
 
 // main();
 
-app.get("/", async (req, res) => {
+app.get("/upload", async (req, res) => {
   const TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
 
   const uploadMemeWithTimeout = new Promise(async (resolve, reject) => {
