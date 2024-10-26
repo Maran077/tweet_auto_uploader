@@ -139,8 +139,7 @@ async function waitForEnabledButton(page: Page, selector: string) {
   );
 }
 
-function waitForSeconds() {
-  const seconds = 20;
+function waitForSeconds(seconds: number) {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve("20 seconds have passed");
@@ -184,7 +183,7 @@ const uploadMeme = async () => {
       console.log(text);
 
       // Wait for a few seconds (just to make sure it's ready for the click)
-      await waitForSeconds();
+      await waitForSeconds(20);
 
       await postBtn?.click();
 
@@ -206,8 +205,35 @@ const uploadMeme = async () => {
 // main();
 
 app.get("/", async (req, res) => {
-  await uploadMeme();
-  res.send("Hello World!");
+  const TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+  const uploadMemeWithTimeout = new Promise(async (resolve, reject) => {
+    // Start the uploadMeme process
+    const uploadPromise = uploadMeme();
+
+    // Set up the timeout
+    const timer = setTimeout(() => {
+      reject(new Error("Upload operation timed out after 5 minutes"));
+    }, TIMEOUT);
+
+    try {
+      // Await uploadMeme and clear the timer if it finishes in time
+      const result = await uploadPromise;
+      clearTimeout(timer);
+      resolve(result);
+    } catch (error) {
+      clearTimeout(timer); // Ensure timer is cleared in case of errors
+      reject(error);
+    }
+  });
+
+  try {
+    await uploadMemeWithTimeout;
+    res.send("Meme uploaded successfully!");
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Meme upload failed");
+  }
 });
 
 app.listen(PORT, () => {
