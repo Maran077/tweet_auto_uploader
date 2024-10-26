@@ -1,6 +1,6 @@
-import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
-// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
+// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
+// import chromium from "@sparticuz/chromium";
+import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
 import snoowrap from "snoowrap";
 import https from "https";
 import fs from "fs";
@@ -152,12 +152,12 @@ const uploadMeme = async () => {
   try {
     const { fileName, success } = await getPicture(); // Download image
     if (!success) return; // Exit if download fails
-    const executablePath = await chromium.executablePath();
+    // const executablePath = await chromium.executablePath();
     const browser = await puppeteer.launch({
-      executablePath,
-      args: chromium.args,
+      // executablePath,
+      // args: chromium.args,
       headless: false,
-      defaultViewport: chromium.defaultViewport,
+      // defaultViewport: chromium.defaultViewport,
     });
     const page = await browser.newPage();
 
@@ -169,6 +169,7 @@ const uploadMeme = async () => {
     const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
       s
     );
+    console.log(s);
 
     if (fileSelector) {
       // Upload the file
