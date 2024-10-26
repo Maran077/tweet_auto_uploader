@@ -205,36 +205,40 @@ const uploadMeme = async () => {
 // main();
 
 app.get("/upload", async (req, res) => {
-  const TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
-
-  const uploadMemeWithTimeout = new Promise(async (resolve, reject) => {
-    // Start the uploadMeme process
-    const uploadPromise = uploadMeme();
-
-    // Set up the timeout
-    const timer = setTimeout(() => {
-      reject(new Error("Upload operation timed out after 5 minutes"));
-    }, TIMEOUT);
-
-    try {
-      // Await uploadMeme and clear the timer if it finishes in time
-      const result = await uploadPromise;
-      clearTimeout(timer);
-      resolve(result);
-    } catch (error) {
-      clearTimeout(timer); // Ensure timer is cleared in case of errors
-      reject(error);
-    }
-  });
-
-  try {
-    await uploadMemeWithTimeout;
-    res.send("Meme uploaded successfully!");
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Meme upload failed");
-  }
+  await uploadMeme();
+  res.send("Meme uploaded successfully!");
 });
+// app.get("/upload", async (req, res) => {
+//   const TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+//   const uploadMemeWithTimeout = new Promise(async (resolve, reject) => {
+//     // Start the uploadMeme process
+//     const uploadPromise = uploadMeme();
+
+//     // Set up the timeout
+//     const timer = setTimeout(() => {
+//       reject(new Error("Upload operation timed out after 5 minutes"));
+//     }, TIMEOUT);
+
+//     try {
+//       // Await uploadMeme and clear the timer if it finishes in time
+//       const result = await uploadPromise;
+//       clearTimeout(timer);
+//       resolve(result);
+//     } catch (error) {
+//       clearTimeout(timer); // Ensure timer is cleared in case of errors
+//       reject(error);
+//     }
+//   });
+
+//   try {
+//     await uploadMemeWithTimeout;
+//     res.send("Meme uploaded successfully!");
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).send("Meme upload failed");
+//   }
+// });
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
