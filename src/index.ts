@@ -149,8 +149,8 @@ function waitForSeconds(seconds: number) {
 
 const uploadMeme = async () => {
   try {
-    const { fileName, success } = await getPicture(); // Download image
-    if (!success) return; // Exit if download fails
+    // const { fileName, success } = await getPicture(); // Download image
+    // if (!success) return; // Exit if download fails
     const executablePath = await chromium.executablePath();
     const browser = await puppeteer.launch({
       executablePath,
@@ -169,26 +169,28 @@ const uploadMeme = async () => {
       s
     );
 
-    if (fileSelector) {
-      // Upload the file
-      await fileSelector.uploadFile(fileName);
+    console.log(fileSelector);
 
-      const btnSelector = "button[data-testid=tweetButtonInline]";
-      const postBtn = await page.$(btnSelector);
+    // if (fileSelector ) {
+    //   // Upload the file
+    //   await fileSelector.uploadFile(fileName);
 
-      // Wait until the tweet button is enabled
-      await waitForEnabledButton(page, btnSelector);
+    //   const btnSelector = "button[data-testid=tweetButtonInline]";
+    //   const postBtn = await page.$(btnSelector);
 
-      const text = await page.evaluate((el) => el?.textContent, postBtn);
-      console.log(text);
+    //   // Wait until the tweet button is enabled
+    //   await waitForEnabledButton(page, btnSelector);
 
-      // Wait for a few seconds (just to make sure it's ready for the click)
-      await waitForSeconds(20);
+    //   const text = await page.evaluate((el) => el?.textContent, postBtn);
+    //   console.log(text);
 
-      await postBtn?.click();
+    //   // Wait for a few seconds (just to make sure it's ready for the click)
+    //   await waitForSeconds(20);
 
-      await deletePicture(fileName);
-    }
+    //   await postBtn?.click();
+
+    //   await deletePicture(fileName);
+    // }
   } catch (error) {
     console.log(error);
   }
