@@ -205,7 +205,7 @@ const uploadMeme = async () => {
 // main();
 
 app.get("/upload", async (req, res) => {
-  await uploadMeme();
+  uploadMeme();
   res.send("Meme uploaded successfully!");
 });
 // app.get("/upload", async (req, res) => {
