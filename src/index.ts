@@ -151,6 +151,8 @@ const uploadMeme = async () => {
   try {
     // const { fileName, success } = await getPicture(); // Download image
     // if (!success) return; // Exit if download fails
+    console.log("start running");
+
     const executablePath = await chromium.executablePath();
     const browser = await puppeteer.launch({
       executablePath,
@@ -159,15 +161,18 @@ const uploadMeme = async () => {
       defaultViewport: chromium.defaultViewport,
     });
     const page = await browser.newPage();
+    console.log("new page");
 
     await page.setCookie(...cookies);
 
     await page.goto("https://x.com");
+    console.log("goto x.com");
 
     const s = "input[data-testid=fileInput]";
     const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
       s
     );
+    // console.log('goto x.com');
 
     console.log(fileSelector);
 
@@ -207,7 +212,7 @@ const uploadMeme = async () => {
 // main();
 
 app.get("/upload", async (req, res) => {
-  uploadMeme();
+  await uploadMeme();
   res.send("Meme uploaded successfully!");
 });
 // app.get("/upload", async (req, res) => {
