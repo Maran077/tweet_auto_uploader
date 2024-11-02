@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: '*/20 * * * *'
+    - cron: '*/1 * * * *'
 jobs:
   build-node:
     runs-on: ubuntu-latest
