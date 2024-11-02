@@ -1,14 +1,10 @@
-// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
-// import chromium from "@sparticuz/chromium";
-import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
+import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
+// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
 import snoowrap from "snoowrap";
 import https from "https";
 import fs from "fs";
-import express, { NextFunction } from "express";
-const app = express();
-const PORT = 3000;
 import { config } from "dotenv";
-
 config();
 // console.log("USER_AGENT:", process.env.USER_AGENT);
 // console.log("CLIENT_ID:", process.env.CLIENT_ID);
@@ -69,7 +65,8 @@ interface DownloadResult {
   fileName: string;
 }
 
-let GlobalfileName = "";
+let previousUrl: string = "";
+
 async function getPicture(): Promise<DownloadResult> {
   const r: DownloadResult = { success: false, fileName: "" };
 
@@ -85,14 +82,14 @@ async function getPicture(): Promise<DownloadResult> {
 
         // Download the image if it has a valid extension
         if (
-          imageUrl.endsWith(".jpg") ||
-          imageUrl.endsWith(".png") ||
-          imageUrl.endsWith(".jpeg")
+          (imageUrl.endsWith(".jpg") ||
+            imageUrl.endsWith(".png") ||
+            imageUrl.endsWith(".jpeg")) &&
+          imageUrl !== previousUrl
         ) {
           const fileName = "meme.jpg";
-          GlobalfileName = fileName;
           const file = fs.createWriteStream(fileName);
-
+          previousUrl = imageUrl;
           return new Promise<DownloadResult>((resolve, reject) => {
             https
               .get(imageUrl, (response) => {
@@ -116,16 +113,16 @@ async function getPicture(): Promise<DownloadResult> {
           });
         } else {
           console.log("No image found in the post.");
-          resolve(r);
+          return r;
         }
       } else {
         console.log("No posts found.");
-        resolve(r);
+        return r;
       }
     })
     .catch((err) => {
       console.error("Error fetching posts:", err);
-      resolve(r);
+      return r;
     });
 }
 
@@ -141,7 +138,8 @@ async function waitForEnabledButton(page: Page, selector: string) {
   );
 }
 
-function waitForSeconds(seconds: number) {
+function waitForSeconds() {
+  const seconds = 20;
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve("20 seconds have passed");
@@ -149,189 +147,57 @@ function waitForSeconds(seconds: number) {
   });
 }
 
-const uploadMeme = async () => {
+async function uploadMeme() {
   try {
-    // const { fileName, success } = await getPicture(); // Download image
-    // if (!success) return; // Exit if download fails
-    console.log("start running");
+    const { fileName, success } = await getPicture(); // Download image
+    console.log(fileName, success);
 
-    // const executablePath = await chromium.executablePath();
+    if (!success) return; // Exit if download fails
+    console.log("start");
+
+    const executablePath = await chromium.executablePath();
     const browser = await puppeteer.launch({
-      // executablePath,
-      // args: chromium.args,
-      // headless: chromium.headless,
-      // defaultViewport: chromium.defaultViewport,
-      headless: false,
+      executablePath,
+      args: chromium.args,
+      headless: chromium.headless,
+      defaultViewport: chromium.defaultViewport,
     });
     const page = await browser.newPage();
-    console.log("new page");
 
     await page.setCookie(...cookies);
 
     await page.goto("https://x.com");
-    console.log("goto x.com");
+    console.log("Goto x.com");
 
     const s = "input[data-testid=fileInput]";
     const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
       s
     );
-    // console.log('goto x.com');
-
-    console.log(fileSelector);
-
-    // if (fileSelector ) {
-    //   // Upload the file
-    //   await fileSelector.uploadFile(fileName);
-
-    //   const btnSelector = "button[data-testid=tweetButtonInline]";
-    //   const postBtn = await page.$(btnSelector);
-
-    //   // Wait until the tweet button is enabled
-    //   await waitForEnabledButton(page, btnSelector);
-
-    //   const text = await page.evaluate((el) => el?.textContent, postBtn);
-    //   console.log(text);
-
-    //   // Wait for a few seconds (just to make sure it's ready for the click)
-    //   await waitForSeconds(20);
-
-    //   await postBtn?.click();
-
-    //   await deletePicture(fileName);
-    // }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-// function main() {
-//   const hrs = 3.2;
-//   uploadMeme();
-//   setInterval(() => {
-//     uploadMeme();
-//   }, hrs * 60 * 60 * 1000);
-// }
-
-// main();
-(async () => {
-  // const executablePath = await chromium.executablePath();
-  const browser = await puppeteer.launch({
-    // executablePath,
-    // args: chromium.args,
-    // headless: chromium.headless,
-    // defaultViewport: chromium.defaultViewport,
-    headless: false,
-  });
-  const page = await browser.newPage();
-
-  await page.setCookie(...cookies);
-  await page.goto("https://x.com");
-  // const pageNotFound=(req: Request, res: Response, next: NextFunction)=>{
-  //   if (!page) {
-  //     res.send("Page not found");
-  //   }else{
-  //     next()
-  //   }
-  // }
-  app.get("/download", async (req, res) => {
-    const { fileName, success } = await getPicture();
-    if (!success) res.send("No image found");
-    res.redirect(`/upload_file`);
-    // res.download(fileName);
-  });
-
-  app.get("/open_twitter", async (req, res) => {
-    if (!page) res.send("No page found");
-    await page.setCookie(...cookies);
-    await page.goto("https://x.com");
-    console.log("goto x.com");
-
-    res.redirect("/upload_file");
-  });
-
-  app.get("/upload_file", async (req, res) => {
-    const s = "input[data-testid=fileInput]";
-    const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
-      s
-    );
-    console.log(fileSelector);
 
     if (fileSelector) {
       // Upload the file
-      await fileSelector.uploadFile(GlobalfileName);
-      console.log("File uploaded successfully!");
+      await fileSelector.uploadFile(fileName);
 
-      res.redirect("/waitforbtn");
+      const btnSelector = "button[data-testid=tweetButtonInline]";
+      const postBtn = await page.$(btnSelector);
+
+      // Wait until the tweet button is enabled
+      await waitForEnabledButton(page, btnSelector);
+
+      const text = await page.evaluate((el) => el?.textContent, postBtn);
+      console.log(text);
+
+      // Wait for a few seconds (just to make sure it's ready for the click)
+      await waitForSeconds();
+      await postBtn?.click();
+
+      await deletePicture(fileName);
+      await waitForSeconds();
+      await browser.close();
     }
-  });
+  } catch (error) {
+    console.log(error);
+  }
+}
 
-  let postBtn: ElementHandle | null = null;
-
-  app.get("/waitforbtn", async (req, res) => {
-    const btnSelector = "button[data-testid=tweetButtonInline]";
-    await waitForEnabledButton(page, btnSelector);
-    postBtn = await page.$(btnSelector);
-    console.log("Wait for button to be enabled");
-
-    res.redirect("/waitforbtns");
-  });
-  app.get("/waitforbtns", async (req, res) => {
-    await waitForSeconds(12);
-    console.log("Wait for 12 seconds");
-
-    res.redirect("/postbtn");
-  });
-
-  app.get("/postbtn", async (req, res) => {
-    const text = await page.evaluate((el) => el?.textContent, postBtn);
-    console.log(text);
-    await postBtn?.click();
-
-    res.redirect("/delete");
-  });
-
-  app.get("/delete", async (req, res) => {
-    await deletePicture(GlobalfileName);
-    res.send("File deleted successfully!");
-  });
-
-  app.get("/upload", async (req, res) => {
-    await uploadMeme();
-    res.send("Meme uploaded successfully!");
-  });
-})();
-// app.get("/upload", async (req, res) => {
-//   const TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
-
-//   const uploadMemeWithTimeout = new Promise(async (resolve, reject) => {
-//     // Start the uploadMeme process
-//     const uploadPromise = uploadMeme();
-
-//     // Set up the timeout
-//     const timer = setTimeout(() => {
-//       reject(new Error("Upload operation timed out after 5 minutes"));
-//     }, TIMEOUT);
-
-//     try {
-//       // Await uploadMeme and clear the timer if it finishes in time
-//       const result = await uploadPromise;
-//       clearTimeout(timer);
-//       resolve(result);
-//     } catch (error) {
-//       clearTimeout(timer); // Ensure timer is cleared in case of errors
-//       reject(error);
-//     }
-//   });
-
-//   try {
-//     await uploadMemeWithTimeout;
-//     res.send("Meme uploaded successfully!");
-//   } catch (error) {
-//     console.error("Error:", error);
-//     res.status(500).send("Meme upload failed");
-//   }
-// });
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+uploadMeme();
