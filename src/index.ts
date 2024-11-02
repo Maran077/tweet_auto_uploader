@@ -1,6 +1,6 @@
-import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
-// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
+// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
+// import chromium from "@sparticuz/chromium";
+import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
 import snoowrap from "snoowrap";
 import https from "https";
 import fs from "fs";
@@ -65,6 +65,8 @@ interface DownloadResult {
   fileName: string;
 }
 
+let previousUrl: string = "";
+
 async function getPicture(): Promise<DownloadResult> {
   const r: DownloadResult = { success: false, fileName: "" };
 
@@ -80,13 +82,14 @@ async function getPicture(): Promise<DownloadResult> {
 
         // Download the image if it has a valid extension
         if (
-          imageUrl.endsWith(".jpg") ||
-          imageUrl.endsWith(".png") ||
-          imageUrl.endsWith(".jpeg")
+          (imageUrl.endsWith(".jpg") ||
+            imageUrl.endsWith(".png") ||
+            imageUrl.endsWith(".jpeg")) &&
+          imageUrl !== previousUrl
         ) {
           const fileName = "meme.jpg";
           const file = fs.createWriteStream(fileName);
-
+          previousUrl = imageUrl;
           return new Promise<DownloadResult>((resolve, reject) => {
             https
               .get(imageUrl, (response) => {
@@ -147,19 +150,25 @@ function waitForSeconds() {
 async function uploadMeme() {
   try {
     const { fileName, success } = await getPicture(); // Download image
+    console.log(fileName, success);
+
     if (!success) return; // Exit if download fails
-    const executablePath = await chromium.executablePath();
+    console.log("start");
+
+    // const executablePath = await chromium.executablePath();
     const browser = await puppeteer.launch({
-      executablePath,
-      args: chromium.args,
-      headless: chromium.headless,
-      defaultViewport: chromium.defaultViewport,
+      // executablePath,
+      // args: chromium.args,
+      // headless: chromium.headless,
+      // defaultViewport: chromium.defaultViewport,
+      headless: "shell",
     });
     const page = await browser.newPage();
 
     await page.setCookie(...cookies);
 
     await page.goto("https://x.com");
+    console.log("Goto x.com");
 
     const s = "input[data-testid=fileInput]";
     const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
@@ -181,10 +190,11 @@ async function uploadMeme() {
 
       // Wait for a few seconds (just to make sure it's ready for the click)
       await waitForSeconds();
-
       await postBtn?.click();
 
       await deletePicture(fileName);
+      await waitForSeconds();
+      await browser.close();
     }
   } catch (error) {
     console.log(error);
@@ -192,7 +202,7 @@ async function uploadMeme() {
 }
 
 function main() {
-  const hrs = 3.2;
+  const hrs = 0.18;
   uploadMeme();
   setInterval(() => {
     uploadMeme();
