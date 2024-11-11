@@ -71,7 +71,7 @@ async function getPicture(): Promise<DownloadResult> {
   const r: DownloadResult = { success: false, fileName: "" };
 
   return reddit
-    .getSubreddit("memes")
+    .getSubreddit("dankmemes")
     .getNew({ limit: 1 })
     .then((posts) => {
       if (posts.length > 0) {
@@ -161,7 +161,7 @@ async function uploadMeme() {
       // args: chromium.args,
       // headless: chromium.headless,
       // defaultViewport: chromium.defaultViewport,
-      headless: "shell",
+      headless: false,
     });
     const page = await browser.newPage();
 
@@ -171,31 +171,31 @@ async function uploadMeme() {
     console.log("Goto x.com");
 
     const s = "input[data-testid=fileInput]";
-    const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
-      s
-    );
+    // const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
+    //   s
+    // );
 
-    if (fileSelector) {
-      // Upload the file
-      await fileSelector.uploadFile(fileName);
+    // if (fileSelector) {
+    //   // Upload the file
+    //   await fileSelector.uploadFile(fileName);
 
-      const btnSelector = "button[data-testid=tweetButtonInline]";
-      const postBtn = await page.$(btnSelector);
+    //   const btnSelector = "button[data-testid=tweetButtonInline]";
+    //   const postBtn = await page.$(btnSelector);
 
-      // Wait until the tweet button is enabled
-      await waitForEnabledButton(page, btnSelector);
+    //   // Wait until the tweet button is enabled
+    //   await waitForEnabledButton(page, btnSelector);
 
-      const text = await page.evaluate((el) => el?.textContent, postBtn);
-      console.log(text);
+    //   const text = await page.evaluate((el) => el?.textContent, postBtn);
+    //   console.log(text);
 
-      // Wait for a few seconds (just to make sure it's ready for the click)
-      await waitForSeconds();
-      await postBtn?.click();
+    //   // Wait for a few seconds (just to make sure it's ready for the click)
+    //   await waitForSeconds();
+    //   await postBtn?.click();
 
-      await deletePicture(fileName);
-      await waitForSeconds();
-      await browser.close();
-    }
+    //   await deletePicture(fileName);
+    //   await waitForSeconds();
+    //   await browser.close();
+    // }
   } catch (error) {
     console.log(error);
   }
