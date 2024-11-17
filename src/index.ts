@@ -1,6 +1,6 @@
-import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
-// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
+// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
+// import chromium from "@sparticuz/chromium";
+import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
 import snoowrap from "snoowrap";
 import https from "https";
 import fs from "fs";
@@ -154,6 +154,7 @@ function waitForSeconds() {
 }
 
 async function uploadMeme() {
+  let browser;
   try {
     const { fileName, success } = await getPicture(); // Download image
     console.log(fileName, success);
@@ -161,13 +162,13 @@ async function uploadMeme() {
     if (!success) return; // Exit if download fails
     console.log("start");
 
-    const executablePath = await chromium.executablePath();
-    const browser = await puppeteer.launch({
-      executablePath,
-      args: chromium.args,
-      headless: chromium.headless,
-      defaultViewport: chromium.defaultViewport,
-      // headless: false,
+    // const executablePath = await chromium.executablePath();
+    browser = await puppeteer.launch({
+      // executablePath,
+      // args: chromium.args,
+      // headless: chromium.headless,
+      // defaultViewport: chromium.defaultViewport,
+      headless: false,
     });
     const page = await browser.newPage();
 
@@ -175,8 +176,9 @@ async function uploadMeme() {
 
     await page.goto("https://x.com");
     console.log("Goto x.com");
-    await waitForSeconds();
+    // await waitForSeconds();
     const s = "input[data-testid=fileInput]";
+    await page.waitForSelector(s);
     const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
       s
     );
@@ -205,10 +207,13 @@ async function uploadMeme() {
 
       await deletePicture(fileName);
       await waitForSeconds();
-      // await browser.close();
     }
   } catch (error) {
     console.log(error);
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 
