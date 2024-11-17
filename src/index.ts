@@ -231,14 +231,14 @@ async function uploadMeme() {
 
 let skipRenders = 0;
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   if (skipRenders < 2) {
     skipRenders++;
     res.send("Hello World! skipRenders: " + skipRenders);
     return;
   }
-  uploadMeme();
-  res.send("Hello World!");
+  const r = await uploadMeme();
+  res.render(r.html);
 });
 
 app.get("/test", (req, res) => {
