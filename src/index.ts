@@ -179,13 +179,14 @@ async function uploadMeme() {
     await page.setCookie(...cookies);
 
     await page.goto("https://x.com");
-    console.log("Goto x.com");
-    const html = await page.content();
-    r = {
-      success: true,
-      html,
-    };
-    console.log(r);
+    const title = await page.title();
+    console.log("Goto x.com", title);
+    // const html = await page.content();
+    // r = {
+    //   success: true,
+    //   html,
+    // };
+    // console.log(r);
 
     // return r;
     // // await waitForSeconds();
