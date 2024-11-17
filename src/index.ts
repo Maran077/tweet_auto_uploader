@@ -1,6 +1,6 @@
-// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
-// import chromium from "@sparticuz/chromium";
-import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
+import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
+// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
 import snoowrap from "snoowrap";
 import https from "https";
 import fs from "fs";
@@ -160,13 +160,13 @@ async function uploadMeme() {
     if (!success) return; // Exit if download fails
     console.log("start");
 
-    // const executablePath = await chromium.executablePath();
+    const executablePath = await chromium.executablePath();
     const browser = await puppeteer.launch({
-      // executablePath,
-      // args: chromium.args,
-      // headless: chromium.headless,
-      // defaultViewport: chromium.defaultViewport,
-      headless: false,
+      executablePath,
+      args: chromium.args,
+      headless: chromium.headless,
+      defaultViewport: chromium.defaultViewport,
+      // headless: false,
     });
     const page = await browser.newPage();
 
