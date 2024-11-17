@@ -179,23 +179,28 @@ async function uploadMeme() {
     const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
       s
     );
+    console.log("fileSelector", Boolean(fileSelector));
 
     if (fileSelector) {
       // Upload the file
       await fileSelector.uploadFile(fileName);
+      console.log("File uploaded");
 
       const btnSelector = "button[data-testid=tweetButtonInline]";
       const postBtn = await page.$(btnSelector);
+      console.log("postBtn", Boolean(postBtn));
 
       // Wait until the tweet button is enabled
       await waitForEnabledButton(page, btnSelector);
 
       const text = await page.evaluate((el) => el?.textContent, postBtn);
       console.log(text);
+      console.log("postBtn");
 
       // Wait for a few seconds (just to make sure it's ready for the click)
       await waitForSeconds();
       await postBtn?.click();
+      console.log("postBtn clicked");
 
       await deletePicture(fileName);
       await waitForSeconds();
