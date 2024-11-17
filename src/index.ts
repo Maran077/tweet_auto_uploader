@@ -206,7 +206,13 @@ async function uploadMeme() {
   }
 }
 
+let skipRenders = 0;
+
 app.get("/", (req, res) => {
+  if (skipRenders < 2) {
+    skipRenders++;
+    res.send("Hello World! skipRenders: " + skipRenders);
+  }
   uploadMeme();
   res.send("Hello World!");
 });
