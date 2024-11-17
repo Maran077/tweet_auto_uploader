@@ -155,12 +155,16 @@ function waitForSeconds() {
 
 async function uploadMeme() {
   let browser;
+  let r = {
+    success: false,
+    html: "",
+  };
   try {
-    const { fileName, success } = await getPicture(); // Download image
-    console.log(fileName, success);
+    // // const { fileName, success } = await getPicture(); // Download image
+    // console.log(fileName, success);
 
-    if (!success) return; // Exit if download fails
-    console.log("start");
+    // if (!success) return; // Exit if download fails
+    // console.log("start");
 
     const executablePath = await chromium.executablePath();
     browser = await puppeteer.launch({
@@ -176,40 +180,48 @@ async function uploadMeme() {
 
     await page.goto("https://x.com");
     console.log("Goto x.com");
-    // await waitForSeconds();
-    const s = "input[data-testid=fileInput]";
-    await page.waitForSelector(s);
-    const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
-      s
-    );
-    console.log("fileSelector", Boolean(fileSelector));
+    const html = await page.content();
+    r = {
+      success: true,
+      html,
+    };
+    return r;
+    // // await waitForSeconds();
+    // const s = "input[data-testid=fileInput]";
+    // // await page.waitForSelector(s);
+    // const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
+    //   s
+    // );
 
-    if (fileSelector) {
-      // Upload the file
-      await fileSelector.uploadFile(fileName);
-      console.log("File uploaded");
+    // console.log("fileSelector", Boolean(fileSelector));
 
-      const btnSelector = "button[data-testid=tweetButtonInline]";
-      const postBtn = await page.$(btnSelector);
-      console.log("postBtn", Boolean(postBtn));
+    // if (fileSelector) {
+    //   // Upload the file
+    //   await fileSelector.uploadFile(fileName);
+    //   console.log("File uploaded");
 
-      // Wait until the tweet button is enabled
-      await waitForEnabledButton(page, btnSelector);
+    //   const btnSelector = "button[data-testid=tweetButtonInline]";
+    //   const postBtn = await page.$(btnSelector);
+    //   console.log("postBtn", Boolean(postBtn));
 
-      const text = await page.evaluate((el) => el?.textContent, postBtn);
-      console.log(text);
-      console.log("postBtn");
+    //   // Wait until the tweet button is enabled
+    //   await waitForEnabledButton(page, btnSelector);
 
-      // Wait for a few seconds (just to make sure it's ready for the click)
-      await waitForSeconds();
-      await postBtn?.click();
-      console.log("postBtn clicked");
+    //   const text = await page.evaluate((el) => el?.textContent, postBtn);
+    //   console.log(text);
+    //   console.log("postBtn");
 
-      await deletePicture(fileName);
-      await waitForSeconds();
-    }
+    //   // Wait for a few seconds (just to make sure it's ready for the click)
+    //   await waitForSeconds();
+    //   await postBtn?.click();
+    //   console.log("postBtn clicked");
+
+    //   // await deletePicture(fileName);
+    //   await waitForSeconds();
+    // }
   } catch (error) {
     console.log(error);
+    return r;
   } finally {
     if (browser) {
       await browser.close();
