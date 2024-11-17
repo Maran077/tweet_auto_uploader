@@ -238,7 +238,7 @@ app.get("/", async (req, res) => {
     return;
   }
   const r = await uploadMeme();
-  res.render(r.html);
+  res.json(r);
 });
 
 app.get("/test", (req, res) => {
