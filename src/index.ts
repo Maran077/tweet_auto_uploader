@@ -179,7 +179,10 @@ async function uploadMeme() {
     await page.setCookie(...cookies);
 
     await page.goto("https://x.com");
+    await waitForSeconds();
     const title = await page.title();
+    console.log("title: ", title);
+
     console.log("Goto x.com", title);
     // const html = await page.content();
     // r = {
