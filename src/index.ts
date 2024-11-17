@@ -185,7 +185,9 @@ async function uploadMeme() {
       success: true,
       html,
     };
-    return r;
+    console.log(r);
+
+    // return r;
     // // await waitForSeconds();
     // const s = "input[data-testid=fileInput]";
     // // await page.waitForSelector(s);
@@ -237,8 +239,8 @@ app.get("/", async (req, res) => {
     res.send("Hello World! skipRenders: " + skipRenders);
     return;
   }
-  const r = await uploadMeme();
-  res.json(r);
+  uploadMeme();
+  res.send("h");
 });
 
 app.get("/test", (req, res) => {
