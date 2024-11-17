@@ -1,11 +1,16 @@
-import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
-// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
+// import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer-core";
+// import chromium from "@sparticuz/chromium";
+import puppeteer, { CookieParam, ElementHandle, Page } from "puppeteer";
 import snoowrap from "snoowrap";
 import https from "https";
 import fs from "fs";
 import { config } from "dotenv";
 config();
+
+import express from "express";
+
+const app = express();
+
 // console.log("USER_AGENT:", process.env.USER_AGENT);
 // console.log("CLIENT_ID:", process.env.CLIENT_ID);
 // console.log("CLIENT_SECRET:", process.env.CLIENT_SECRET);
@@ -155,12 +160,13 @@ async function uploadMeme() {
     if (!success) return; // Exit if download fails
     console.log("start");
 
-    const executablePath = await chromium.executablePath();
+    // const executablePath = await chromium.executablePath();
     const browser = await puppeteer.launch({
-      executablePath,
-      args: chromium.args,
-      headless: chromium.headless,
-      defaultViewport: chromium.defaultViewport,
+      // executablePath,
+      // args: chromium.args,
+      // headless: chromium.headless,
+      // defaultViewport: chromium.defaultViewport,
+      headless: false,
     });
     const page = await browser.newPage();
 
@@ -200,4 +206,20 @@ async function uploadMeme() {
   }
 }
 
-uploadMeme();
+app.get("/", (req, res) => {
+  uploadMeme();
+  res.send("Hello World!");
+});
+
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
+// function main() {
+//   const hrs = 0.18;
+//   uploadMeme();
+//   setInterval(() => {
+//     uploadMeme();
+//   }, hrs * 60 * 60 * 1000);
+// }
+
+// main();
