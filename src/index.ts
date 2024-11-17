@@ -212,6 +212,7 @@ app.get("/", (req, res) => {
   if (skipRenders < 2) {
     skipRenders++;
     res.send("Hello World! skipRenders: " + skipRenders);
+    return;
   }
   uploadMeme();
   res.send("Hello World!");
