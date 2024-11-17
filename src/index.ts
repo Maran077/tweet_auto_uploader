@@ -70,7 +70,7 @@ interface DownloadResult {
   fileName: string;
 }
 
-let previousUrl: string = "";
+// let previousUrl: string = "";
 
 async function getPicture(): Promise<DownloadResult> {
   const r: DownloadResult = { success: false, fileName: "" };
@@ -87,14 +87,15 @@ async function getPicture(): Promise<DownloadResult> {
 
         // Download the image if it has a valid extension
         if (
-          (imageUrl.endsWith(".jpg") ||
-            imageUrl.endsWith(".png") ||
-            imageUrl.endsWith(".jpeg")) &&
-          imageUrl !== previousUrl
+          imageUrl.endsWith(".jpg") ||
+          imageUrl.endsWith(".png") ||
+          imageUrl.endsWith(".jpeg")
+          // &&
+          // imageUrl !== previousUrl
         ) {
           const fileName = "meme.jpg";
           const file = fs.createWriteStream(fileName);
-          previousUrl = imageUrl;
+          // previousUrl = imageUrl;
           return new Promise<DownloadResult>((resolve, reject) => {
             https
               .get(imageUrl, (response) => {
@@ -174,7 +175,7 @@ async function uploadMeme() {
 
     await page.goto("https://x.com");
     console.log("Goto x.com");
-
+    await waitForSeconds();
     const s = "input[data-testid=fileInput]";
     const fileSelector: ElementHandle<HTMLInputElement> | null = await page.$(
       s
@@ -204,7 +205,7 @@ async function uploadMeme() {
 
       await deletePicture(fileName);
       await waitForSeconds();
-      await browser.close();
+      // await browser.close();
     }
   } catch (error) {
     console.log(error);
@@ -227,7 +228,7 @@ app.get("/test", (req, res) => {
   res.send("Test completed!");
 });
 
-app.listen(3000, () => {
+app.listen(3001, () => {
   console.log("Server is running on port 3000");
 });
 // function main() {
